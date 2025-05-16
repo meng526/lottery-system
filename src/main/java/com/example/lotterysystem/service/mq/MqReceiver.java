@@ -73,26 +73,26 @@ public class MqReceiver {
                 return;
             }
 
-            // 状态扭转处理（重要！！ 设计模式）
+            // 状态扭转处理
             statusConvert(param);
 
             // 保存中奖者名单
             List<WinningRecordDO> winningRecordDOList = drawPrizeService.saveWinnerRecords(param);
 
-            // 通知中奖者（邮箱、短信）
-            // 抽奖之后的后续流程，异步（并发）处理
+            // 通知中奖者
+          
             syncExecute(winningRecordDOList);
 
         } catch (ServiceException e) {
             logger.error("处理 MQ 消息异常！{}:{}", e.getCode(), e.getMessage(), e);
-            // 需要保证事务一致性（回滚）
+            // 需要保证事务一致性
             rollback(param);
-            // 抛出异常: 消息重试（解决异常：代码bug、网络问题、服务问题）
+          
             throw e;
 
         } catch (Exception e) {
             logger.error("处理 MQ 消息异常！", e);
-            // 需要保证事务一致性（回滚）
+            // 需要保证事务一致性
             rollback(param);
             // 抛出异常
             throw e;
